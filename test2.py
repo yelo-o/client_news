@@ -2,35 +2,30 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
-# 검색어와 검색 기간 설정
-query = '테슬라'
-start_date = datetime.now() - timedelta(weeks=1)
-end_date = datetime.now()
+url0 = 'https://search.naver.com/search.naver?where=news&query=파이썬&sm=tab_pge&sort=1&photo=0&field=0&reporter_article=&pd=3&ds=2023.04.26&de=2023.05.03&docid=&nso=so%3Add%2Cp%3Afrom20230426to20230503%2Ca%3Aall&mynews=0&refresh_start=0&related=0'
 
-# 검색 기간 URL 생성
-start_date_str = start_date.strftime('%Y.%m.%d')
-end_date_str = end_date.strftime('%Y.%m.%d')
-url_template = f'https://search.naver.com/search.naver?where=news&query={query}&sm=tab_pge&sort=0&photo=0&field=0&reporter_article=&pd=3&ds={start_date_str}&de={end_date_str}&docid=&nso=so%3Add%2Cp%3Afrom{start_date_str.replace(".", "")}to{end_date_str.replace(".", "")}%2Ca%3Aall&mynews=0&refresh_start=0&related=0'
+# while문을 돌리기 위한 초기값 설정
+# page_num = 1
+next_page_exist = True
+articles = [] # 리스트 선언 및 초기화
 
-# 첫 페이지에서 마지막 페이지 번호 추출
-url = url_template.format(query=query, start_date_str=start_date_str, end_date_str=end_date_str, start=1)
-response = requests.get(url)
-soup = BeautifulSoup(response.text, 'html.parser')
-last_page = int(soup.select('.paging .btn_last')[0]['href'].split('start=')[-1])
+while next_page_exist:
+    # 페이지 요청
+    res = requests.get(url0)
+    soup = BeautifulSoup(res.text, 'html.parser')
 
-# 각 페이지에서 기사 제목과 링크 가져오기
-articles = []
-for page in range(1, last_page + 1):
-    url = url_template.format(query=query, start_date_str=start_date_str, end_date_str=end_date_str, start=(page - 1) * 10 + 1)
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    for item in soup.select('.list_news .news_wrap .news_area'):
-        title = item.select_one('.news_tit').text
-        link = item.select_one('.news_tit')['href']
-        articles.append({'title': title, 'link': link})
-
-# 결과 출력
-for article in articles:
-    print(article['title'])
-    print(article['link'])
-    print('-' * 50)
+    # 다음 버튼이 있는지 확인
+    next_button = soup.select_one(".btn_next")
+    if next_button:
+        # 다음 버튼이 있으면 다음 페이지로 이동
+        # page_num += 1
+        url1 = f"https://search.naver.com/search.naver{next_button['href']}"
+        for item in soup.select('.list_news .news_wrap .news_area'):
+            title = item.select_one('.news_tit').text # 제목 긁어오기
+            link = item.select_one('.news_tit')['href'] # 링크 긁어오기
+            articles.append({'title': title, 'link': link}) # 긁어온 제목과 링크 'articles' 라는 리스트에 딕셔너리 형태로 추가하기
+    else:
+        # 다음 버튼이 없으면 while문 종료
+        next_page_exist = False
+        break
+print(articles)

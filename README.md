@@ -1,5 +1,8 @@
 ## 2023.05.02 네이버 뉴스 데이터 크롤링 작업 시작
 
+## 설치 모듈
+	pip install beautifulsoup4 requests pandas openpyxl
+
 ## 프로세스
 ### 1. clients.txt 파일 열기
 클라이언트 목록 저장 (추후에 변경 가능하도록)

@@ -17,7 +17,6 @@ end_date = datetime.now() # 2023-05-02 14:49:23.322423 / 타입 : class 'datetim
 # 타입 변경 class -> str
 start_date_str = start_date.strftime('%Y.%m.%d') # 2023-04-25 / 타입 : string
 end_date_str = end_date.strftime('%Y.%m.%d') # 2023-05-02 / 타입 : string
-# 검색 기간 URL 생성
 
 
 
